@@ -1,1 +1,85 @@
+Info: 
+  Title: Movie Booking System
+  Descprition: This is a system that allows users to book movie tickets online. It allows customers to browse available movies, select showtimes, choose their seats, and make payments for ticket reservations.
+  Version: 1.1.1
 
+servers:
+  -url: http://RESTAPIDesignAssigment.com
+
+paths:
+  /movies/{movieName}:
+    get:
+      summary: Returns a list of movie times for this movie.
+      parameters:
+        - name: movieName
+          in: path
+          required: true
+          description: The movie name to return.
+          schema:
+            type: string
+            minimum: 1
+      responses:
+        '200':
+          description: successful response with available showtimes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: Minions 4
+                  dates: array
+                      type: string
+                      format: date
+                      example: 02-25-2024 at 7pm
+        '400':
+          description: The specified movie name is invalid (contains an invalid special character).
+        '404':
+          description: A movie with the specified name was not found.
+  /movies:                  
+     post:
+        summary: reserves a selected movie time for a user.
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  showtime_id:
+                    type: string
+                    description: Unique identifier for the selected showtime
+                
+        responses:
+          '200':
+            description: movie time successfully selected
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    confirmation_code:
+                      type: string
+          '404':
+            description: the movie with the specified time was not found.
+
+  /movies/{showtime_id}:
+    delete:
+      summary: Remove a showtime
+      description: cancels a pending showtime reservation for a movie.
+      parameters:
+        - name: showtime_id
+          in: path
+          description: ID of the showtime to be canceled
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Showtime successfully canceled
+        '404':
+          description: Showtime not found
+        default:
+          description: Unexpected error
